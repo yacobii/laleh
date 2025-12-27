@@ -1,0 +1,257 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+@plugin "@tailwindcss/forms";
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-yekan: 'Yekan', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+
+    --color-accent: var(--color-neutral-800);
+    --color-accent-content: var(--color-neutral-800);
+    --color-accent-foreground: var(--color-white);
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-white);
+        --color-accent-content: var(--color-white);
+        --color-accent-foreground: var(--color-neutral-800);
+    }
+}
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply  !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+
+
+
+[x-cloak] {
+    display: none !important;
+}
+
+
+.rtl {
+    direction: rtl;
+    text-align: justify;
+}
+
+.ltr {
+    direction: ltr;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+
+
+.error {
+    @apply text-sm text-red-500 mt-1;
+}
+
+.checkout-edit-user p {
+    @apply text-sm mb-1;
+}
+
+
+
+.size {
+    @apply md:max-w-6xl 2xl:max-w-7xl    mx-auto;
+}
+
+
+.post-prev, .post-next {
+    position: absolute;
+    top: 50%;
+    margin-top: -15px;
+    color: black;
+    font-size: 20px;
+    text-align: center;
+    line-height: 30px;
+    cursor: pointer;
+    z-index: 100;
+}
+
+.post-prev {
+    left: 5px;
+}
+
+
+.post-next {
+    right: 5px;
+}
+
+.markdown h1 {
+    @apply text-3xl font-bold my-5;
+}
+.markdown h2 {
+    @apply text-2xl font-bold my-3;
+}
+
+
+.cm-s-easymde .cm-header-2 {
+    @apply font-bold text-lg;
+}
+
+.markdown h3 {
+    @apply text-lg font-bold my-3;
+}
+
+.markdown h4 {
+    @apply font-bold my-2;
+}
+
+.markdown h5 {
+    @apply font-light my-2;
+}
+.markdown ul {
+    @apply list-disc list-inside;
+}
+
+
+.pc-view-cart {
+    @apply grid place-items-center shrink-0 transition hover:bg-gray-900 focus:outline-none p-2 text-center  bg-gray-500 text-white rounded-lg;
+}
+
+.pc-btn-entekhab-size {
+    @apply p-2 w-full bg-gray-300  text-center hover:bg-gray-400 focus:outline-none cursor-pointer;
+}
+
+.pc-btn-tab {
+    @apply focus:outline-none font-bold underline underline-offset-8;
+}
+
+.pc-btn-addcrat {
+    @apply w-full focus:outline-none p-2 bg-black hover:bg-gray-700 transition text-white rounded-lg;
+}
+
+.pc-no {
+    @apply flex items-center justify-center border border-black rounded-lg  p-3  gap-x-2 text-lg  mt-5;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+
+table.coupons th {
+    @apply text-center border p-1 bg-slate-200;
+}
+
+table.coupons tr {
+    @apply text-center p-2 border;
+}
+
+table.coupons tr td {
+    @apply text-center p-2 border;
+}
+
+
+.asinput {
+    @apply w-full text-xl text-black h-full  placeholder:text-sm tracking-widest placeholder:tracking-normal placeholder:text-gray-600 focus:outline-none ring-0 outline-none;
+}
+
+.asbtn {
+    @apply focus:outline-none grid place-items-center bg-green-500 text-white w-40 px-2 h-full;
+}
+
+
+.admin-active {
+    @apply  text-green-500 text-sm underline underline-offset-8 decoration-1 decoration-green-500;
+}
+
+.btn-oa {
+    @apply py-1 px-3 rounded-lg text-white text-sm;
+}
+
+.format h3{
+    @apply  text-red-500;
+}
+
+.format h3:not(:first-of-type) {
+    @apply mt-5 ;
+}
+
+ .profile-card {
+     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+     transition: all 0.3s ease;
+ }
+
+
+.tab-active {
+    border-bottom: 3px solid #4F46E5;
+    color: #4F46E5;
+    font-weight: 600;
+}
+.edit-input {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #E5E7EB;
+}
+.edit-input:focus {
+    border-bottom: 1px solid #4F46E5;
+    outline: none;
+}
+
+.gst {
+    @apply flex flex-col md:flex-row items-start gap-10;
+}
+
+.logout-btn {
+    @apply flex items-center gap-2 px-2 text-sm py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors;
+}
