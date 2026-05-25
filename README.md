@@ -7,7 +7,9 @@
    git clone https://github.com/yacobii/laleh.git
    
    composer install
-   
+
+   npm install
+
    cp .env.example .env
    
    php artisan key:generate
