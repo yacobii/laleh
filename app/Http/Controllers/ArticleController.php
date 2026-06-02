@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ArticleResource;
-use App\Models\a\Article;
+use App\Models\Article;
 
 class ArticleController extends Controller
 {
