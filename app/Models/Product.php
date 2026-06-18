@@ -656,4 +656,15 @@ class  Product extends Model
       return null;
     }
 
+    // yacobi code
+    public function ghorfes()
+    {
+        return $this->belongsToMany(
+            GhorfeOnlineList::class,
+            'ghorfe_online_list_product',
+            'product_id',
+            'ghorfe_online_list_id'
+        );
+    }
+
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\GhorfeController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ServiceController;
@@ -43,3 +44,7 @@ Route::get('/categories/{category:id}', [CategoryController::class, 'category'])
 // faqs
 Route::get('/employees', [EmployeeController::class, 'employees'])->name('employees');
 Route::get('/employees/{employee:id}', [EmployeeController::class, 'employee'])->name('employee');
+
+// ghorfe
+Route::get('/ghorfes', [GhorfeController::class, 'ghorfes']);
+Route::get('/ghorfes/{ghorfe}', [GhorfeController::class, 'ghorfe']);
