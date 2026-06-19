@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 class Service extends Model
 {
-    use SoftDeletes;
+    use Sluggable,SoftDeletes;
 
     /**
      * @var string[]
@@ -137,10 +138,6 @@ class Service extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function keywords()
-    {
-        return $this->belongsToMany(Keyword::class);
-    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -179,11 +176,8 @@ class Service extends Model
     {
         return $this->hasMany(ServiceItem::class);
     }
-    /**
-     * Summary of activeServiceItems
-     * @param Service $item
-     * @return \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
-     */
+
+
     public function activeServiceItems(Service $item)
     {
         return $item->service_items()->where('status' , true)->where('isShow' , true)->get();
@@ -288,10 +282,6 @@ class Service extends Model
         return $this->morphMany(WorkSample::class, 'worksampleable');
     }
 
-    public function categories()
-    {
-        return $this->belongsToMany(Category::class, '');
-    }
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
@@ -362,9 +352,7 @@ class Service extends Model
         $title = request('title');
         $purchase_type = request('purchase_type');
         $pay_type = request('pay_type');
-        $query = FilterHelper::getDataByCheckGhorfeExistOrNot($query , 'belongsToMany' , null);
 
-        $query->where('deleted_at',null);
         if (auth()->user() && auth()->user()->admin_representation) {
             $representation = auth()->user()->admin_representation->id;
             $query->whereHas('representations', function ($query) use ($representation) {

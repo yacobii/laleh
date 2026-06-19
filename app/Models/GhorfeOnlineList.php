@@ -10,11 +10,12 @@ use Illuminate\Database\Eloquent\Builder;
 
 class GhorfeOnlineList extends Model
 {
+    use SoftDeletes , Sluggable;
     /**
      * @var array
      */
     protected $guarded = [];
-    protected $table = 'ghorfe_online_lists';
+
 
     /**
      *types of ghorfeOnline
@@ -45,8 +46,18 @@ class GhorfeOnlineList extends Model
         ];
     }
 
+    /**
+     * @return string
+     */
+//    public function getRouteKeyName()
+//    {
+//        return 'slug';
+//    }
 
 
+    /**
+     * @return string
+     */
     public function path()
     {
         return "/$this->slug";
@@ -66,34 +77,13 @@ class GhorfeOnlineList extends Model
     {
         return $this->belongsToMany(Category::class);
     }
-
-
-//    public function products()
-//    {
-//        return $this->belongsToMany(Product::class);
-//    }
-
-
- // yacobi code
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function products()
     {
-        return $this->belongsToMany(
-            Product::class,
-            'ghorfe_online_list_product',
-            'ghorfe_online_list_id',
-            'product_id'
-        )
-            ->withPivot([
-                'price',
-                'stock',
-                'purchase_type',
-                'pay_type',
-                'tariff_id',
-                'guarantee'
-            ])
-            ->wherePivotNull('deleted_at');
+        return $this->belongsToMany(Product::class);
     }
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
     */
