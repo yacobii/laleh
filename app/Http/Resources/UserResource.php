@@ -18,8 +18,14 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'family' => $this->family,
+            'full_name' => trim($this->name . ' ' . $this->family),
             'phone' => $this->phone,
-            'image' => $this->imgavatar,
+            'email' => $this->email,
+            'avatar' => $this->avatar,
+            'level' => $this->level,
+            'active' => (bool) $this->active,
+            'wallet' => $this->wallet,
+            'credit' => $this->credit,
         ];
     }
 }

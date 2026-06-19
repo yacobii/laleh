@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ArticleResource;
+use App\Http\Resources\GalleryResource;
 use App\Http\Resources\GhorfeResource;
 use App\Http\Resources\ServiceResource;
 use App\Models\GhorfeOnlineList;
@@ -58,9 +59,10 @@ class GhorfeController extends Controller
 
     public function ghorfeGalleries(GhorfeOnlineList $ghorfe)
     {
-        return GalleryResource::collection(
-            $ghorfe->galleries()->latest()->paginate()
-        );
+        $galleries = $ghorfe->galleries()->latest()->paginate();
+
+        return GalleryResource::collection($galleries);
     }
+
 
 }

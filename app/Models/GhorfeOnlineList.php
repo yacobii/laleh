@@ -4,18 +4,18 @@ namespace App\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Builder;
 
 class GhorfeOnlineList extends Model
 {
-    use SoftDeletes , Sluggable;
+    use Sluggable , SoftDeletes;
+
     /**
      * @var array
      */
     protected $guarded = [];
-
 
     /**
      *types of ghorfeOnline
@@ -25,35 +25,34 @@ class GhorfeOnlineList extends Model
         'product' => 'فروش کالا',
         'all' => 'ارائه خدمات و فروش کالا',
     ];
+
     /**
      * @var string[]
      */
     protected $casts = [
         'sms_code' => 'array',
-        'footer_tag' => 'array'
+        'footer_tag' => 'array',
     ];
+
     /**
      * Return the sluggable configuration array for this model.
-     *
-     * @return array
      */
-    public function sluggable():array
+    public function sluggable(): array
     {
         return [
             'slug' => [
-                'source' => 'en_title'
-            ]
+                'source' => 'en_title',
+            ],
         ];
     }
 
     /**
      * @return string
      */
-//    public function getRouteKeyName()
-//    {
-//        return 'slug';
-//    }
-
+    //    public function getRouteKeyName()
+    //    {
+    //        return 'slug';
+    //    }
 
     /**
      * @return string
@@ -63,102 +62,120 @@ class GhorfeOnlineList extends Model
         return "/$this->slug";
     }
 
+    public function galleries()
+    {
+        return $this->morphMany(Gallery::class, 'galleryable');
+    }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function services()
     {
         return $this->belongsToMany(Service::class);
     }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function categories()
     {
         return $this->belongsToMany(Category::class);
     }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function products()
     {
         return $this->belongsToMany(Product::class);
     }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    */
+     * @return BelongsToMany
+     */
     public function financialPlansTypes()
     {
         return $this->belongsToMany(FinancialPlansType::class);
     }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-    */
+     * @return BelongsToMany
+     */
     public function factors()
     {
         return $this->belongsToMany(Factor::class);
     }
-     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+
+    /**
+     * @return BelongsToMany
      */
     public function users()
     {
         return $this->belongsToMany(User::class);
     }
-     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+
+    /**
+     * @return BelongsToMany
      */
     public function callcenters()
     {
         return $this->belongsToMany(Callcenter::class);
     }
-     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+
+    /**
+     * @return MorphMany
      */
     public function articles()
     {
-        return $this->morphMany(Article::class , 'articleable');
+        return $this->morphMany(Article::class, 'articleable');
     }
-     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+
+    /**
+     * @return MorphMany
      */
     public function tickets()
     {
-        return $this->morphMany(Ticket::class , 'ticketable');
+        return $this->morphMany(Ticket::class, 'ticketable');
     }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function sliders()
     {
-        return $this->morphMany(Slider::class , 'sliderable');
+        return $this->morphMany(Slider::class, 'sliderable');
     }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function about()
     {
         return $this->hasOne(About::class);
     }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function contacts()
     {
-        return $this->morphMany(Contact::class , 'contactable');
+        return $this->morphMany(Contact::class, 'contactable');
     }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function cards()
     {
-        return $this->morphMany(Card::class , 'cardable');
+        return $this->morphMany(Card::class, 'cardable');
     }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return MorphMany
      */
     public function abouts()
     {
-        return $this->morphMany(About::class , 'aboutable');
+        return $this->morphMany(About::class, 'aboutable');
     }
 }
