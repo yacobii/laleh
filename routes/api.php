@@ -50,3 +50,4 @@ Route::get('/ghorfes', [GhorfeController::class, 'ghorfes']);
 Route::get('/ghorfes/{ghorfe}', [GhorfeController::class, 'ghorfe']);
 Route::get('/ghorfes/{ghorfe}/services', [GhorfeController::class, 'ghorfeServices']);
 Route::get('/ghorfes/{ghorfe}/articles', [GhorfeController::class, 'ghorfeArticles']);
+Route::get('/ghorfes/{ghorfe}/galleries', [GhorfeController::class, 'ghorfeGalleries']);

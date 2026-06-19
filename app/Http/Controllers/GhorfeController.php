@@ -27,7 +27,8 @@ class GhorfeController extends Controller
             'services.centers',
             'services.financialPlansTypes',
             'products.categories',
-            'articles.category_article', // Load article categories
+            'articles.category_article',
+            'galleries',
             'users'
         ]);
         return new GhorfeResource($ghorfe);
@@ -54,4 +55,12 @@ class GhorfeController extends Controller
 
         return ArticleResource::collection($articles);
     }
+
+    public function ghorfeGalleries(GhorfeOnlineList $ghorfe)
+    {
+        return GalleryResource::collection(
+            $ghorfe->galleries()->latest()->paginate()
+        );
+    }
+
 }
