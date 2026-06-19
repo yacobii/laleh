@@ -48,3 +48,5 @@ Route::get('/employees/{employee:id}', [EmployeeController::class, 'employee'])-
 // ghorfe
 Route::get('/ghorfes', [GhorfeController::class, 'ghorfes']);
 Route::get('/ghorfes/{ghorfe}', [GhorfeController::class, 'ghorfe']);
+Route::get('/{ghorfe}/services', [GhorfeController::class, 'ghorfeServices']);
+Route::get('/{ghorfe}/articles', [GhorfeController::class, 'ghorfeArticles']);

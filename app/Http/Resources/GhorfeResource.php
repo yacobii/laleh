@@ -34,7 +34,7 @@ class GhorfeResource extends JsonResource
             'products' => ProductResource::collection(
                 $this->whenLoaded('products')
             ),
-
+            'articles' => ArticleResource::collection($this->whenLoaded('articles')),
             'users' => $this->whenLoaded('users', function () {
                 return $this->users->pluck('id');
             }),

@@ -19,7 +19,7 @@ class ArticleResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'category' => new CategoryResource($this->whenLoaded('category_article')),
-            'image' =>  $this->old_image,
+            'image' => $this->old_image ? url($this->old_image) : null,
             'status' => $this->status,
             'link' => route('article', ['article' => $this->id]),
             'created_at' => $this->created_at,
