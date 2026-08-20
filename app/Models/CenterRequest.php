@@ -1,0 +1,178 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class CenterRequest extends Model
+{
+    use SoftDeletes;
+
+    /**
+     * @var array
+     */
+    protected $guarded = [];
+
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
+
+    const TYPE = [
+        'seller' => 'فروشنده',
+        'producer' => 'تولید کننده',
+        'supplier' => 'تامین کننده',
+        'service_provider' => 'خدمات دهنده',
+    ];
+
+    /**
+     * @return BelongsTo
+     */
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function representation()
+    {
+        return $this->belongsTo(Representation::class);
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function center()
+    {
+        return $this->hasOne(Center::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function center_category()
+    {
+        return $this->belongsTo(CenterCategory::class, 'center_category_id');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function province()
+    {
+        return $this->belongsTo(Province::class, 'province_id');
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function galleries()
+    {
+        return $this->morphMany(Gallery::class, 'galleryable');
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function histories()
+    {
+        return $this->morphMany(History::class, 'historiable');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function scopeFilter($query)
+    {
+        $name = request('name');
+        $subject = request('subject');
+        $phone = request('phone');
+        $province = request('province');
+        $type = request('type');
+        $service_category = request('service_category');
+        $product_category = request('product_category');
+        $status = request('status');
+        $start_date = request('start_date');
+        $end_date = request('end_date');
+        $representation = request('representation');
+
+        if (isset($name) && trim($name) != '') {
+            $query->where('name', 'LIKE', '%'.$name.'%');
+        }
+
+        if (isset($representation) && trim($representation) != 'all') {
+            $query->where('representation_id', $representation);
+        }
+
+        if (isset($subject) && trim($subject) != '') {
+            $query->where('subject', 'LIKE', '%'.$subject.'%');
+        }
+
+        if (isset($phone) && trim($phone) != '') {
+            $query->where('phone', $phone);
+        }
+
+        if (isset($province) && trim($province) != 'all') {
+            $query->where('province_id', $province);
+        }
+
+        if (isset($status) && trim($status) != 'all') {
+            $query->where('status', $status);
+        }
+
+        if (isset($type) && trim($type) != 'all') {
+            $query->where('type', $type);
+        }
+
+        if (isset($product_category) && trim($product_category) != 'all') {
+            $query->where('center_category_id', $product_category);
+        }
+
+        if (isset($service_category) && trim($service_category) != 'all') {
+            $query->where('center_category_id', $service_category);
+        }
+
+        if (isset($start_date) && trim($start_date) != '' && isset($end_date) && trim($end_date) != '') {
+            $query->whereDate('created_at', '>=', $start_date)->whereDate('created_at', '<=', $end_date);
+        }
+
+        return $query;
+    }
+
+    /**
+     * @return string
+     */
+    public static function status($status)
+    {
+        switch ($status) {
+            case 0:
+                return 'جدید';
+                break;
+            case 1:
+                return 'فعال';
+                break;
+            case 2:
+                return 'معلق';
+                break;
+            case 3:
+                return 'رد شده';
+                break;
+            default:
+                return 'جدید';
+        }
+    }
+}

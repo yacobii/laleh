@@ -1,0 +1,185 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class PercentageAllocationEmployee extends Model
+{
+    use SoftDeletes;
+
+    /**
+     * @var string[]
+     */
+    protected $guarded = ['id'];
+
+    /**
+     *types of PercentageAllocationEmployee
+     */
+    const TYPE = [
+        'register_price' => 'برداشت از محل هزینه ثبت نام',
+        'all_total_price' => 'برداشت از محل جمع کل فاکتور',
+        'income_total_price' => 'برداشت از محل درآمد جمع کل فاکتور',
+        'company_profit' => 'برداشت از محل کارمزد تسهیلات',
+    ];
+
+    /**
+     *FactorSender type of PercentageAllocationEmployee
+     */
+    const FactorSender = [
+        'all' => 'همه',
+        'employee_factors' => 'مرتبط با همکار',
+    ];
+
+    /**
+     *payment type of PercentageAllocationEmployee
+     */
+    const PaymentType = [
+        'instantPayment' => 'واریز به حساب )آنی(',
+        'depositWallet' => 'واریز به کیف پول',
+    ];
+
+    /**
+     * @return MorphTo
+     */
+    public function percentageAllocationEmployeeable()
+    {
+        return $this->morphTo();
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function agent()
+    {
+        return $this->belongsTo(User::class, 'agent_id');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function userPerformances()
+    {
+        return $this->belongsToMany(UserPerformance::class);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function scopeFilter($query)
+    {
+        $type = request('type');
+        $user = request('user');
+
+        if (isset($user) && $user != 'all') {
+            $query->where('user_id', $user);
+        }
+        if (isset($type) && $type != 'all') {
+            $query->where('type', 'LIKE', '%'.$type.'%');
+        }
+
+        return $query;
+    }
+
+    /**
+     * @param  mixed  $type
+     * @param  mixed  $price
+     * @param  mixed  $date
+     * @param  mixed  $factor_item_service_tariff
+     * @param  mixed  $payment_type
+     */
+    public static function setUserPerformance(FactorItem $factor_item, $type, $price, $date, $factor_item_service_tariff, $payment_type)
+    {
+        $description = self::TYPE[$type];
+        $percentage_allocation_employees = [];
+        if ($type == 'register_price') {
+            $percentage_allocation_employees = $factor_item->factoritemable->percentageAllocationEmployees->where('type', $type)->where('payment_type', $payment_type)->where('start_allocation_date', '<=', now())->where('end_allocation_date', '>=', now());
+        } elseif ($factor_item->center) {
+            $percentage_allocation_employees = $factor_item->center->percentageAllocationEmployees->where('type', $type)->where('payment_type', $payment_type)->where('start_allocation_date', '<=', now())->where('end_allocation_date', '>=', now());
+        }
+        foreach ($percentage_allocation_employees as $item) {
+            $is_applicable = true;
+            if ($item->factor_sender == 'employee_factors') {
+                $is_applicable = self::checkPercentageAllocationEmployeeConditions($item, $factor_item);
+            }
+            $user_performance_price = $price * ($item->percent / 100);
+            $is_applicable ? ($user_performance = UserPerformance::store($item, $item->user, $description, $price, $user_performance_price, $factor_item, $date)) : '';
+            if ($is_applicable && $type == 'all_total_price') {
+                $user_performance_sessions_done = $factor_item_service_tariff->sessions->where('status', 1);
+                // set user performance sessions done
+                UserPerformance::setSessionsDone($user_performance, $user_performance_sessions_done);
+            }
+        }
+
+        return $percentage_allocation_employees;
+    }
+
+    /**
+     * @param  $payment_type
+     *                       set emplloyee performance from percentageAllocation employee
+     */
+    public static function setPercentageAllocationEmployee(Factor $item, $payment_type)
+    {
+        $percentage_allocation_employees = $item->factorItems->map(function ($factor_item, $payment_type) {
+            // set emplloyee performance from percentageAllocation employee
+            $price = $factor_item->financialPlansType->price;
+
+            return PercentageAllocationEmployee::setUserPerformance($factor_item, 'register_price', $price, now(), null, $payment_type);
+        });
+
+        return $percentage_allocation_employees;
+    }
+
+    /**
+     * @param  mixed  $item
+     * @param  mixed  $factor_item
+     * @return bool
+     */
+    private static function checkPercentageAllocationEmployeeConditions($item, $factor_item)
+    {
+        if ($item->user_id == $factor_item->factor->callcenter_id) {
+            $is_applicable = true;
+            if ($item->limit_type == 'count') {
+                $employee_sucess_factors_count = $item->user->factors->where('status', 1)->where('created_at', '>=', $item->start_allocation_date)->count();
+                $is_applicable = $employee_sucess_factors_count >= $item->min_limit_type ? true : false;
+                $is_applicable = $is_applicable && $employee_sucess_factors_count <= $item->max_limit_type ? true : false;
+            }
+            if ($item->limit_type == 'price') {
+                $employee_sucess_factors_sum_price = $item->user->factors->where('status', 1)->where('created_at', '>=', $item->start_allocation_date)->sum('price');
+                $is_applicable = $employee_sucess_factors_sum_price >= $item->min_limit_type ? true : false;
+                $is_applicable = $is_applicable && $employee_sucess_factors_sum_price <= $item->max_limit_type ? true : false;
+            }
+
+            return $is_applicable;
+        }
+
+        return false;
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'user_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(PercentageAllocationEmployee::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(PercentageAllocationEmployee::class, 'parent_id');
+    }
+}

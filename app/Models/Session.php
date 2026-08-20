@@ -1,0 +1,310 @@
+<?php
+
+namespace App\Models;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Session extends Model
+{
+    use SoftDeletes;
+
+    protected $table = 'execution_sessions';
+    /**
+     * @var string[]
+     */
+    protected $dates = ['deleted_at'];
+
+    /**
+     * @var array
+     */
+    protected $guarded = [];
+
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
+
+        /**
+     * @param FactorItem $factor_item
+     * @return void
+     */
+    public static function checkAndStartEntryVisitSession(FactorItem $factor_item)
+    {
+        $session=Session::whereIn('status',[3,4,5,6])->where('factor_item_id',$factor_item->id)->first();
+        if (is_null($session) ){
+          $session=  Session::create([
+                'status' => 3,
+                'user_id' => auth()->user()->id,
+                'factor_item_id' => $factor_item->id,
+                'date' => Carbon::now(),
+                'description_before' => 'ویزیت اصلی / مراجعه حضوری کاربر .',
+            ]);
+        }
+        if (!is_null($session)){
+            self::userSessionStartEntry($session);
+        }
+    }
+
+    /**
+     * @param FactorItem $factor_item
+     * @param int $int
+     * @return void
+     */
+    public static function changeVisitStatusByFactorItem(FactorItem $factor_item, int $int)
+    {
+      $session= Session::whereIn('status',[3,5])->where('factor_item_id',$factor_item->id);
+           if (!is_null($session)){
+               $session->update(
+                   [
+                       'status'=>$int
+                   ]
+               );
+           }
+
+    }
+
+    /**
+     * @param $factor_item
+     * @return void
+     */
+    public static function checkAndEndEntrySession($factor_item)
+    {
+        Session::whereIn('status',[3,5,8])->where('factor_item_id',$factor_item->id)->update([
+            'status' => 6,
+        ]);
+
+        // if (!is_null($session)){
+        //     self::userSessionEndEntry($session);
+        // }
+    }
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function factorItemServiceTariff()
+    {
+        return $this->belongsTo(FactorItemServiceTariff::class, 'factor_item_service_tariff_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function factorItem()
+    {
+        return $this->belongsTo(FactorItem::class);
+    }
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
+     */
+    public function userPerformances()
+    {
+        return $this->belongsToMany(UserPerformance::class);
+    }
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class , 'user_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function agent()
+    {
+        return $this->belongsTo(User::class, 'agent_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function confirmer()
+    {
+        return $this->belongsTo(User::class , 'confirmer_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function assistant()
+    {
+        return $this->belongsTo(User::class, 'assistant_id');
+    }
+
+    /**
+     * Get the entries
+     */
+    public function entries()
+    {
+        return $this->morphMany(Entry::class, 'entryable');
+    }
+
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeFilter($query)
+    {
+        $name = request('name');
+        $family = request('family');
+        $phone = request('phone');
+        $startDate = request('start_date');
+        $endDate = request('end_date');
+        $user = request('user');
+        $status = request('status');
+        $center = request('center');
+        $employee = request('employee');
+
+        if (auth()->user()->center_id) {
+            $center = auth()->user()->center_id;
+            $query->whereHas('factorItem', function ($query) use ($center) {
+                $query->where('center_id', $center);
+            });
+        }
+        elseif (auth()->user()->admin_representation) {
+            $query->whereHas('factorItem', function ($query) {
+                $query->whereHas('representation', function ($query){
+                    $query->where('representation_id', auth()->user()->admin_representation_id);
+                });
+            });
+        }
+
+        if (auth()->user()->admin_organization) {
+            $query->whereHas('factorItem', function ($query) {
+                $query->whereHas('factor', function ($query) {
+                    $query->whereIn('organization_id', auth()->user()->admin_organization->organ_code);
+                });
+            });
+        }
+
+        if (auth()->user()->hasPermission('session')) {
+            $query->where('agent_id', auth()->user()->id);
+        }
+
+        if (isset($name) && trim($name) != '') {
+            $query->whereHas('factorItem', function ($query) use ($name) {
+                $query->whereHas('factor', function ($query) use ($name) {
+                    $query->whereHas('user', function ($query) use ($name) {
+                        $query->where('name', 'LIKE', '%' . $name . '%');
+                    });
+                });
+            });
+        }
+
+        if (isset($family) && trim($family) != '') {
+            $query->whereHas('factorItem', function ($query) use ($family) {
+                $query->whereHas('factor', function ($query) use ($family) {
+                    $query->whereHas('user', function ($query) use ($family) {
+                        $query->where('family', 'LIKE', '%' . $family . '%');
+                    });
+                });
+            });
+        }
+
+        if (isset($phone) && trim($phone) != '') {
+            $query->whereHas('factorItem', function ($query) use ($phone) {
+                $query->whereHas('factor', function ($query) use ($phone) {
+                    $query->whereHas('user', function ($query) use ($phone) {
+                        $query->where('phone', $phone);
+                    });
+                });
+            });
+        }
+
+        if (isset($user) && trim($user) != '') {
+            $query->where('user_id', $user);
+        }
+
+        if (isset($startDate) && trim($startDate) != '' && isset($endDate) && trim($endDate) != '') {
+            $query->whereDate('date', '>=' ,$startDate)->whereDate('date', '<=' ,$endDate);
+        }
+
+        if (isset($status) && trim($status) != '' && $status != 'all') {
+            $query->whereStatus($status);
+        }
+        if (isset($employee) && $employee != 'all') {
+            $query->where('agent_id',$employee);
+        }
+
+        if (isset($center) && $center != 'all') {
+            $query->whereHas('factorItem', function ($query) use ($center) {
+                $query->where('center_id', $center);
+            });
+        }
+        return $query;
+    }
+
+    /**
+     * @param $status
+     * @return string
+     */
+    public static function status($status)
+    {
+        return [
+            '0' => 'در انتظار انجام کار',
+            '1' => 'انجام شده',
+            '2' => 'منتظر تایید',
+            '8' => 'در انتظار تعیین نوبت',
+            '3' => 'در انتظار ثبت مشاوره',
+            '4' => 'ویزیت تایید شده',//Currently not developed
+            '5' => 'آماده اجرا',
+            '6' => 'مشاوره شد',
+            '7' => 'ویزیت لغو شد',
+        ][$status];
+    }
+
+    /**
+     * @param Session $session
+     * @return bool
+     */
+    public static function userSessionStartEntry(Session $session)
+    {
+        $output=false;
+        if ($session->entries()->count()==0){
+            $session->entries()->create([
+                'user_id'=>$session->factorItem->factor->user->id,
+                'start'=>Carbon::now(),
+                'created_by'=>auth()->user()->id
+            ]);
+            $output=true;
+        }
+        return $output;
+    }
+
+
+    /**
+     * @param Session $session
+     * @return bool
+     */
+    public static function userSessionEndEntry(Session $session)
+    {
+        $output=false;
+        $entry=$session->entries()->latest()->whereNotNull('start')->where('end',null)->first();
+        if (!is_null($entry)){
+            $entry->update([
+                'end'=>Carbon::now(),
+                'created_by'=>auth()->user()->id
+            ]);
+            $output=true;
+        }
+        return $output;
+    }
+    /**
+     * @param mixed $factorItem_id
+     * @return mixed
+     */
+    public static function createSessionPendingMainInvoice($factorItem_id)
+    {
+        $session = Session::create([
+            'status' => 5,
+            'user_id' => auth()->user() ? auth()->user()->id : null,
+            'factor_item_id' => $factorItem_id,
+            'date' => now(),
+            'description_before' => 'این پرونده آماده اجرا جهت شروع کار می باشد.',
+        ]);
+
+        return $session;
+    }
+}

@@ -2,33 +2,44 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class About extends Model implements HasMedia
+class About extends Model
 {
+    use SoftDeletes;
 
-    protected $table = 'abouts';
-    protected $guarded = ['id'];
+    protected $dates = ['deleted_at'];
 
-    use InteractsWithMedia;
+    protected $fillable = ['ghorfe_online_list', 'image_two', 'image_three', 'image_four', 'image_five', 'content', 'content2',
+        'content_one', 'content_two', 'content_three', 'content_four', 'content_five'];
 
-    public function registerMediaConversions(Media $media = null): void
+    /**
+     * @return BelongsTo
+     */
+    public function ghorfeOnline()
     {
-        $this
-            ->addMediaConversion('preview')
-            ->width(200)
-            ->quality(50)
-            ->nonQueued();
-
-        $this
-            ->addMediaConversion('about')
-            ->width(1000)
-            ->quality(60)
-            ->nonQueued();
+        return $this->belongsTo(GhorfeOnlineList::class, 'ghorfe_online_list_id');
     }
 
+    public function getImageOneUrlAttribute()
+    {
+        return optional($this->image_one)->getFirstMediaUrl('images');
+    }
+
+    public function getImageTwoUrlAttribute()
+    {
+        return optional($this->image_two)->getFirstMediaUrl('images');
+    }
+
+    public function getImageThreeUrlAttribute()
+    {
+        return optional($this->image_three)->getFirstMediaUrl('images');
+    }
+
+    public function getImageFourUrlAttribute()
+    {
+        return optional($this->image_four)->getFirstMediaUrl('images');
+    }
 }

@@ -2,78 +2,402 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Image\Enums\Fit;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Spatie\Sitemap\Contracts\Sitemapable;
-use Spatie\Sitemap\Tags\Url;
-use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * @method static create(string[] $category)
- */
-class Category extends Model implements Sitemapable, HasMedia
+class Category extends Model
 {
+    use SoftDeletes;
 
-    use InteractsWithMedia, HasRecursiveRelationships;
+    /**
+     * @var string[]
+     */
+    protected $dates = ['deleted_at'];
 
-    protected $guarded = ['id'];
+    /**
+     * @var string[]
+     */
+    protected $fillable = ['title', 'subTitle', 'en_title', 'slug', 'isActive', 'displayOrder', 'min_credit', 'max_credit', 'percent', 'price', 'tax', 'minimum_discount'];
 
+    /**
+     * @var array
+     */
+    protected $guarded = [];
 
-    public static function booted()
+    // start relationShip
+
+    /**
+     * @return BelongsTo
+     */
+    public function permission()
     {
-        static::saving(function ($model) {
-            if (is_null($model->slug)) {
-                $model->slug = str()->slug($model->title, '-', null);
+        return $this->belongsTo(Permission::class);
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function financialPlansTypeItems()
+    {
+        return $this->morphMany(FinancialPlansTypeItem::class, 'financialplanstypeItemable');
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function beforeforms()
+    {
+        return $this->morphMany(BeforeForm::class, 'beforeformable');
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function factoritems()
+    {
+        return $this->morphMany(FactorItem::class, 'factoritemable');
+    }
+
+    //
+    //    /**
+    //     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+    //     */
+    //    public function centers()
+    //    {
+    //        return $this->morphMany(Center::class, 'centerable');
+    //    }
+    /**
+     * Get all of the centers for the post.
+     */
+    public function centers()
+    {
+        return $this->morphToMany(Center::class, 'centerable');
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function installments()
+    {
+        return $this->morphMany(Installment::class, 'installmentable');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class)->withPivot('id')->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function related()
+    {
+        return $this->belongsToMany(Category::class, 'related_category', 'category_id', 'related_id');
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function galleries()
+    {
+        return $this->morphMany(Gallery::class, 'galleryable');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function brands()
+    {
+        return $this->belongsToMany(Brand::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function attributeGroups()
+    {
+        return $this->hasMany(AttributeGroup::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function sliders()
+    {
+        return $this->hasMany(Slider::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function attributes()
+    {
+        return $this->hasMany(Attribute::class);
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function menu()
+    {
+        return $this->morphMany(Menu::class, 'menuable');
+    }
+
+    /**
+     * @return MorphMany
+     */
+    public function couponItems()
+    {
+        return $this->morphMany(CouponItem::class, 'couponitemable');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function childs()
+    {
+        return $this->hasMany(Category::class, 'parent_id', 'id');
+    }
+
+    // category by category many to many
+
+    /**
+     * @return BelongsToMany
+     */
+    public function similarGroups()
+    {
+        return $this->belongsToMany(Category::class, 'similar_groups', 'similarable_id',
+            'relation_id')
+            ->withPivotValue(['similar_model' => Category::class, 'relation_model' => Category::class]);
+    }
+
+    // category by service many to many
+
+    /**
+     * @return BelongsToMany
+     */
+    public function similarGroupsServices()
+    {
+        return $this->belongsToMany(Service::class, 'similar_groups', 'similarable_id',
+            'relation_id')
+            ->withPivotValue(['similar_model' => Category::class, 'relation_model' => Service::class]);
+    }
+
+    // category_article by category many to many
+
+    /**
+     * @return BelongsToMany
+     */
+    public function similarGroupsCategoriesArticle()
+    {
+        return $this->belongsToMany(Category::class, 'similar_groups', 'similarable_id',
+            'relation_id')
+            ->withPivotValue(['similar_model' => CategoryArticle::class, 'relation_model' => Category::class]);
+    }
+
+    // Get information from a column of a category - in many files
+
+    /**
+     * @return string
+     */
+    public static function findCategory($id, $field)
+    {
+        $cat = Category::find($id);
+        if ($cat) {
+            return $cat->$field;
+        }
+
+        return '';
+    }
+
+    // Display the names of a child's parent - use in subCategory.blade
+
+    /**
+     * @return string
+     */
+    public static function findPath($cat_id)
+    {
+        $res = '';
+        $cat = Category::where('id', $cat_id)->select('id', 'title', 'path')->first();
+        if (isset($cat) && isset($cat->path)) {
+            $explode = explode('/', $cat->path);
+            foreach ($explode as $item) {
+                $cat_by_item = Category::where('id', $item)->select('id', 'title')->first();
+                if (isset($cat_by_item)) {
+                    $res = $res.' / '.$cat_by_item->title;
+                }
             }
-        });
+        }
 
+        return $res;
     }
 
-
-    public function registerMediaConversions(?Media $media = null): void
+    /**
+     * @return mixed
+     */
+    public static function countChild($cat_id)
     {
-        $this
-            ->addMediaConversion('preview')
-            ->fit(Fit::Contain, 200, 200)
-            ->nonQueued();
+        $count = Category::where('parent_id', $cat_id)->count();
 
-        $this
-            ->addMediaConversion('cover')
-            ->fit(Fit::Contain, 500, 500)
-            ->nonQueued();
-
-        $this
-            ->addMediaConversion('main')
-            ->fit(Fit::Contain, 1000, 1000)
-            ->nonQueued();
+        return $count;
     }
 
-    public function registerMediaCollections(): void
+    // This category has children or not - in many files
+
+    /**
+     * @return int|null
+     */
+    public static function hasChild($id)
     {
-        $this
-            ->addMediaCollection('products')
-            ->useFallbackUrl(asset('fallback/fallback-slider.jpg'));
+        if ($id != null) {
+            $cat = Category::find($id);
+            if ($cat) {
+                $childes = Category::where('parent_id', $id)->count();
+                if ($childes && $childes > 0) {
+                    return 1;
+                }
 
+                return 0;
+            }
+        }
+
+        return null;
     }
 
-    protected function casts(): array
+    // The last category of a product category - use in ProductController
+
+    /**
+     * @return mixed|null
+     */
+    public static function latestCategory($product)
     {
-        return [
-            'active' => 'boolean'
-        ];
+        $category_ids = $product->categories()->pluck('category_id');
+        foreach ($category_ids as $category_id) {
+            if (Category::hasChild($category_id) == 0) {
+                return $category_id;
+            }
+        }
+
+        return null;
     }
 
-    public function products() {
-        return $this->hasMany(Product::class);
-    }
+    // Get all childless categories - use AttributeGroupController and brandController
 
-    public function toSitemapTag(): Url|string|array
+    /**
+     * @return array
+     */
+    public static function lastCategory()
     {
-        return Url::create(route('category.products', $this));
+        $res = [];
+        // all category except services
+        $service_cat = Category::where('id', 2)->select('id', 'title')->first();
+        $service_childes = Category::where('parent_id', $service_cat->id)->select('id', 'title')->pluck('id');
+        foreach (Category::whereNotIn('id', $service_childes)->get() as $cat) {
+            if (Category::hasChild($cat->id) == 0) {
+                $res[] = $cat;
+            }
+        }
+
+        return $res;
     }
 
+    // To show the parents of the category in the category search - use in CategoryController
+
+    public static function findFather($id, $category_center_id)
+    {
+        $c = Category::find($id);
+        $path = explode('/', $c->path);
+        array_shift($path);
+        if ($category_center_id != null) {
+            if ($path[0] == $category_center_id) {
+                return Category::select('id', 'title')->whereIn('id', $path)->orWhere('id', $id)->orderBy('depth', 'ASC')->get();
+            }
+        } else {
+            return Category::select('id', 'title')->whereIn('id', $path)->orWhere('id', $id)->orderBy('depth', 'ASC')->get();
+        }
+    }
+
+    /**
+     * @return null
+     */
+    public static function category($id, $field)
+    {
+        $category = Category::select('id', $field)->where('id', $id)->first();
+        if (isset($category->$field)) {
+            return $category->$field;
+        }
+
+        return null;
+    }
+
+    // To get the parents of a category - use in ProductController
+
+    /**
+     * @return string[]
+     */
+    public static function findAllFather($id)
+    {
+        $c = Category::find($id);
+        $path = explode('/', $c->path);
+
+        return $path;
+    }
+
+    // Get all categories by depth = 2 - use ProductController
+
+    /**
+     * @return array
+     */
+    public static function categoryDepth($center_id)
+    {
+        $category_lists = [];
+        // all category except services
+        $service_cat = Category::where('id', 2)->select('id', 'title')->first();
+        $service_childes = Category::where('parent_id', $service_cat->id)->select('id', 'title')->pluck('id');
+        if ($center_id != null) {
+            $category_id = Center::find($center_id)->centerable->id;
+            $categories = Category::whereNotIn('id', $service_childes)->where('parent_id', $category_id)->where('depth', 2)->get();
+        } else {
+            $categories = Category::whereNotIn('id', $service_childes)->where('depth', 2)->get();
+        }
+
+        foreach ($categories as $cat) {
+            $category_lists[] = $cat;
+        }
+
+        return $category_lists;
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function services()
+    {
+        return $this->hasMany(Service::class, 'category_id', 'id');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function ghorfeOnlineLists()
+    {
+        return $this->belongsToMany(GhorfeOnlineList::class);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function scopeFilter($query)
+    {
+        $query = FilterHelper::getDataByCheckGhorfeExistOrNot($query , 'belongsToMany' , null);
+
+        return $query;
+    }
 }

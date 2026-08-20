@@ -3,31 +3,38 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Coupon extends Model
 {
-    protected $fillable = [
-        'title',
-        'code', 'count',
-        'percentage',
-        'active',
-        'expired_at',
-    ];
+    /**
+     * @var array
+     */
+    protected $guarded = [];
+    use SoftDeletes;
+    /**
+     * @var array
+     */
+    protected $dates = ['deleted_at'];
+    /**
+     * @var string[]
+     */
+    protected $fillable=['title','code','discount','capacity','reserved','status','start_at','end_at','pay_type','purchase_type'];
 
-    protected $casts = [
-        'active' => 'boolean',
-        'expired_at' => 'datetime',
-        'percentage' => 'decimal:2',
-    ];
-
-    public function orders(): HasMany
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function factors()
     {
-        return $this->hasMany(Order::class, 'coupon_id');
+        return $this->hasMany(Factor::class);
     }
 
-    public function isValid(): bool
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function couponItems()
     {
-        return $this->active && ($this->expired_at === null || $this->expired_at->isFuture());
+        return $this->hasMany(CouponItem::class);
     }
 }
