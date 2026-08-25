@@ -7,6 +7,7 @@ use App\Http\Resources\GalleryResource;
 use App\Http\Resources\GhorfeResource;
 use App\Http\Resources\ServiceResource;
 use App\Models\GhorfeOnlineList;
+use App\Models\Service;
 use Illuminate\Http\Request;
 
 class GhorfeController extends Controller
@@ -15,24 +16,18 @@ class GhorfeController extends Controller
     {
         $slug = $request->header('X-Ghorfe-Slug');
 
-        //        $ghorfes = GhorfeOnlineList::with([
-        //            'services.centers',
-        //            'services.financialPlansTypes',
-        //            'products.categories',
-        //            'users',
-        //        ])->paginate(10);
         $query = GhorfeOnlineList::with([
             'services.centers',
             'services.financialPlansTypes',
             'products.categories',
             'users',
         ]);
+
         if ($slug) {
             $ghorfe = $query->where('slug', $slug)->firstOrFail();
-
-            // Return a single resource
             return new GhorfeResource($ghorfe);
         }
+
         $ghorfes = $query->paginate(10);
 
         return GhorfeResource::collection($ghorfes);
@@ -63,6 +58,17 @@ class GhorfeController extends Controller
 
         return ServiceResource::collection($services);
     }
+
+    public function ghorfeService(GhorfeOnlineList $ghorfe, int $service)
+    {
+        $service = $ghorfe->services()
+            ->with(['centers', 'financialPlansTypes'])
+            ->where('services.id', $service)
+            ->firstOrFail();
+
+        return new ServiceResource($service);
+    }
+
 
     /**
      * GET /api/ghorfes/{id}/articles

@@ -86,10 +86,29 @@ class GhorfeOnlineList extends Model
     /**
      * @return BelongsToMany
      */
-    public function products()
+    public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class);
+        return $this->belongsToMany(
+            Product::class,
+            'ghorfe_online_list_product',
+            'ghorfe_online_list_id',
+            'product_id'
+        )
+            ->withPivot([
+                'id',
+                'user_id',
+                'price',
+                'stock',
+                'purchase_type',
+                'pay_type',
+                'tariff_id',
+                'guarantee',
+                'deleted_at',
+                'created_at',
+                'updated_at',
+            ]);
     }
+
 
     /**
      * @return BelongsToMany
@@ -179,6 +198,14 @@ class GhorfeOnlineList extends Model
         return $this->morphMany(About::class, 'aboutable');
     }
 
-
+    public function employees(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Employee::class,
+            'employee_ghorfe_online_list', // <-- Make sure this table matches exactly in DB
+            'ghorfe_online_list_id',
+            'employee_id'
+        )->withPivot('id', 'sort');
+    }
 
 }

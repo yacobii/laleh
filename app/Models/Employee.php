@@ -191,4 +191,26 @@ class Employee extends Model
         );
     }
 
+    public function ghorfes()
+    {
+        return $this->belongsToMany(
+            GhorfeOnlineList::class,
+            'employee_ghorfe_online_list',
+            'employee_id',
+            'ghorfe_online_list_id'
+        )
+            ->withPivot('id', 'sort');
+    }
+
+    public function services()
+    {
+        return $this->belongsToMany(
+            Service::class,
+            'employee_service',
+            'employee_id',
+            'service_id'
+        )
+            ->withPivot('id', 'subtitle', 'from_price', 'sort');
+    }
+
 }

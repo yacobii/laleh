@@ -7,21 +7,29 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class EmployeeResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'user' => new UserResource($this->whenLoaded('user')),
-            'business_phone' => $this->business_phone,
-            'job' => $this->work_title,
-            'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-        ];
+        return array_merge(
+            parent::toArray($request),
+
+            [
+                'user' => new UserResource(
+                    $this->whenLoaded('user')
+                ),
+
+                'services' => ServiceResource::collection(
+                    $this->whenLoaded('services')
+                ),
+
+                // Exists only when employee was fetched via $ghorfe->employees()
+                'ghorfe_pivot' => $this->when(
+                    $this->pivot !== null,
+                    fn () => [
+                        'id' => $this->pivot->id,
+                        'sort' => $this->pivot->sort,
+                    ]
+                ),
+            ]
+        );
     }
 }

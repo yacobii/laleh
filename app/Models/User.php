@@ -787,4 +787,9 @@ class User extends Authenticatable implements LaratrustUser
         return $this->belongsTo(Employee::class, 'parent_id');
     }
 
+    public function ghorfes()
+    {
+        return $this->belongsToMany(GhorfeOnlineList::class);
+    }
+
 }

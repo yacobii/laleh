@@ -3,20 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
-use App\Models\Product;
+use App\Models\GhorfeOnlineList;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function products()
+    public function products(Request $request, GhorfeOnlineList $ghorfe)
     {
-        return ProductResource::collection(Product::query()
-            ->with('categories')
-            ->latest()->paginate());
+        $products = $ghorfe->products()
+            ->with(['categories'])
+            ->paginate($request->integer('per_page', 15));
+
+        return ProductResource::collection($products);
     }
 
-    public function product(Product $product)
+    public function product(GhorfeOnlineList $ghorfe, int $product)
     {
-        $product->load('categories');
+        $product = $ghorfe->products()
+            ->with(['categories'])
+            ->where('products.id', $product)
+            ->firstOrFail();
 
         return new ProductResource($product);
     }

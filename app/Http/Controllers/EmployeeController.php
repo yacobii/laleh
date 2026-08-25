@@ -3,20 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\EmployeeResource;
-use App\Models\Employee;
+use App\Models\GhorfeOnlineList;
+use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
-    public function employees()
+    /**
+     * GET /api/ghorfes/{ghorfe}/employees
+     */
+    public function employees(Request $request, GhorfeOnlineList $ghorfe)
     {
-        return EmployeeResource::collection(Employee::query()
-            ->with('user')
-            ->latest()->paginate());
+        $query = $ghorfe->employees()
+            ->with(['user', 'services'])
+            ->orderByPivot('sort');
+
+        dd($query->toSql(), $query->getBindings(), $query->get());
     }
 
-    public function employee(Employee $employee)
+
+    /**
+     * GET /api/ghorfes/{ghorfe}/employees/{employee}
+     */
+    public function employee(GhorfeOnlineList $ghorfe, int $employee)
     {
-        //        $employee->load('services');
+        $employee = $ghorfe->employees()
+            ->with([
+                'user',
+                'services',
+            ])
+            ->where('employees.id', $employee)
+            ->firstOrFail();
+
         return new EmployeeResource($employee);
     }
 }

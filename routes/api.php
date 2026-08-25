@@ -48,9 +48,16 @@ Route::get('/employees/{employee:id}', [EmployeeController::class, 'employee'])-
 Route::get('/ghorfes', [GhorfeController::class, 'ghorfes']);
 Route::get('/ghorfes/{ghorfe}', [GhorfeController::class, 'ghorfe']);
 Route::get('/ghorfes/{ghorfe}/services', [GhorfeController::class, 'ghorfeServices']);
+Route::get('/ghorfes/{ghorfe}/services/{service}', [GhorfeController::class, 'ghorfeService']);
 Route::get('/ghorfes/{ghorfe}/articles', [GhorfeController::class, 'ghorfeArticles']);
 Route::get('/ghorfes/{ghorfe}/galleries', [GhorfeController::class, 'ghorfeGalleries']);
+
 Route::get('/ghorfes/{ghorfe}/callcenter', [CallCenterController::class, 'index']);
-Route::get('/ghorfes/{ghorfe}/user', [UserController::class, 'users']);
+Route::post('/ghorfes/{ghorfe}/callcenter', [CallCenterController::class, 'store']);
+
+Route::get('/ghorfes/{ghorfe}/users', [UserController::class, 'index']);
+Route::get('/ghorfes/{ghorfe}/users/{user}', [UserController::class, 'show']);
 Route::get('/ghorfes/{ghorfe}/employees', [EmployeeController::class, 'employees']);
 Route::get('/ghorfes/{ghorfe}/employees/{employee}', [EmployeeController::class, 'employee']);
+Route::get('/ghorfes/{ghorfe}/products', [ProductController::class, 'products']);
+Route::get('/ghorfes/{ghorfe}/products/{product}', [ProductController::class, 'product']);
