@@ -20,7 +20,8 @@
         "santigarcor/laratrust": "^8.5.5",
         "spatie/laravel-markdown": "^2.8.0",
         "spatie/laravel-medialibrary": "^11.23.5",
-        "spatie/laravel-permission": "^6.25.0"
+        "spatie/laravel-permission": "^6.25.0",
+        "wotz/laravel-swagger-ui": "^2.1.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16.5",

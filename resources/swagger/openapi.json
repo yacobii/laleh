@@ -1,0 +1,360 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Shahin API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://shahin.test/api",
+            "description": "Local API server"
+        }
+    ],
+    "paths": {
+        "/ghorfes": {
+            "get": {
+                "tags": ["Ghorfes"],
+                "summary": "Get all ghorfes",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}": {
+            "get": {
+                "tags": ["Ghorfes"],
+                "summary": "Get one ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Ghorfe not found"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/services": {
+            "get": {
+                "tags": ["Services"],
+                "summary": "Get services of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/services/{service}": {
+            "get": {
+                "tags": ["Services"],
+                "summary": "Get one service of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Service"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Service not found"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/articles": {
+            "get": {
+                "tags": ["Articles"],
+                "summary": "Get articles of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/galleries": {
+            "get": {
+                "tags": ["Galleries"],
+                "summary": "Get galleries of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/callcenter": {
+            "get": {
+                "tags": ["Call Center"],
+                "summary": "Get call center records of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Call Center"],
+                "summary": "Create a call center request",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CallCenterStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/users": {
+            "get": {
+                "tags": ["Users"],
+                "summary": "Get users of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/users/{user}": {
+            "get": {
+                "tags": ["Users"],
+                "summary": "Get one user of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    },
+                    {
+                        "$ref": "#/components/parameters/User"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/employees": {
+            "get": {
+                "tags": ["Employees"],
+                "summary": "Get employees of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/employees/{employee}": {
+            "get": {
+                "tags": ["Employees"],
+                "summary": "Get one employee of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Employee"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Employee not found"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/products": {
+            "get": {
+                "tags": ["Products"],
+                "summary": "Get products of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+
+        "/ghorfes/{ghorfe}/products/{product}": {
+            "get": {
+                "tags": ["Products"],
+                "summary": "Get one product of a ghorfe",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/Ghorfe"
+                    },
+                    {
+                        "$ref": "#/components/parameters/Product"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    }
+                }
+            }
+        }
+    },
+
+    "components": {
+        "parameters": {
+            "Ghorfe": {
+                "name": "ghorfe",
+                "in": "path",
+                "required": true,
+                "description": "Ghorfe ID",
+                "schema": {
+                    "type": "integer",
+                    "example": 1
+                }
+            },
+            "Service": {
+                "name": "service",
+                "in": "path",
+                "required": true,
+                "description": "Service ID",
+                "schema": {
+                    "type": "integer",
+                    "example": 1
+                }
+            },
+            "User": {
+                "name": "user",
+                "in": "path",
+                "required": true,
+                "description": "User ID",
+                "schema": {
+                    "type": "integer",
+                    "example": 1
+                }
+            },
+            "Employee": {
+                "name": "employee",
+                "in": "path",
+                "required": true,
+                "description": "Employee ID",
+                "schema": {
+                    "type": "integer",
+                    "example": 1
+                }
+            },
+            "Product": {
+                "name": "product",
+                "in": "path",
+                "required": true,
+                "description": "Product ID",
+                "schema": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+
+        "schemas": {
+            "CallCenterStoreRequest": {
+                "type": "object",
+                "description": "Replace these fields with the real validation fields from CallCenterController::store.",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Mehdi Yaghoubi"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "09121234567"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Please call me."
+                    }
+                }
+            }
+        }
+    }
+}
