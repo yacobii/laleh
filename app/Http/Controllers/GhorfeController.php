@@ -14,7 +14,7 @@ class GhorfeController extends Controller
 {
     public function ghorfes(Request $request)
     {
-        $slug = $request->header('X-Ghorfe-Slug');
+        $domain = $request->header('X-Ghorfe-Domian');
 
         $query = GhorfeOnlineList::with([
             'services.centers',
@@ -23,8 +23,8 @@ class GhorfeController extends Controller
             'users',
         ]);
 
-        if ($slug) {
-            $ghorfe = $query->where('slug', $slug)->firstOrFail();
+        if ($domain) {
+            $ghorfe = $query->where('domain_active', $domain)->firstOrFail();
             return new GhorfeResource($ghorfe);
         }
 
