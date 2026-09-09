@@ -14,7 +14,7 @@ class GhorfeController extends Controller
 {
     public function ghorfes(Request $request)
     {
-        $domain = $request->header('X-Ghorfe-Domian');
+        $domain = $request->header('X-Ghorfe-Domain');
 
         $query = GhorfeOnlineList::with([
             'services.centers',
