@@ -14,31 +14,32 @@ class GhorfeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'title' => $this->title,
-            'slug' => $this->slug,
-            'phone' => $this->call,
-            'address' => $this->address,
-            'lat' => $this->lat,
-            'lon' => $this->lon,
-            'description' => $this->description,
-            'instagram' => $this->instagram,
-            'telegram' => $this->telegram,
-            'website' => $this->domain_active,
+        // All raw columns (id, name, domain_active, description, ...)
+        $data = parent::toArray($request);
+
+        // Merge relationships on top
+        return array_merge($data, [
             'call_centers' => CallCenterResource::collection(
                 $this->whenLoaded('callCenters')
             ),
             'services' => ServiceResource::collection(
                 $this->whenLoaded('services')
             ),
-
             'products' => ProductResource::collection(
                 $this->whenLoaded('products')
             ),
-            'articles' => ArticleResource::collection($this->whenLoaded('articles')),
-            'galleries' => GalleryResource::collection($this->whenLoaded('galleries')),
-            'users' => UserResource::collection($this->whenLoaded('users')),
-        ];
+            'articles' => ArticleResource::collection(
+                $this->whenLoaded('articles')
+            ),
+            'galleries' => GalleryResource::collection(
+                $this->whenLoaded('galleries')
+            ),
+            'users' => UserResource::collection(
+                $this->whenLoaded('users')
+            ),
+            'employees' => EmployeeResource::collection(
+                $this->whenLoaded('employees')
+            ),
+        ]);
     }
 }

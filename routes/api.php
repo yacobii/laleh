@@ -46,18 +46,20 @@ Route::get('/employees/{employee:id}', [EmployeeController::class, 'employee'])-
 
 // ghorfe
 Route::get('/ghorfes', [GhorfeController::class, 'ghorfes']);
-Route::get('/ghorfes/{ghorfe}', [GhorfeController::class, 'ghorfe']);
-Route::get('/ghorfes/{ghorfe}/services', [GhorfeController::class, 'ghorfeServices']);
-Route::get('/ghorfes/{ghorfe}/services/{service}', [GhorfeController::class, 'ghorfeService']);
-Route::get('/ghorfes/{ghorfe}/articles', [GhorfeController::class, 'ghorfeArticles']);
-Route::get('/ghorfes/{ghorfe}/galleries', [GhorfeController::class, 'ghorfeGalleries']);
-
-Route::get('/ghorfes/{ghorfe}/callcenter', [CallCenterController::class, 'index']);
-Route::post('/ghorfes/{ghorfe}/callcenter', [CallCenterController::class, 'store']);
-
-Route::get('/ghorfes/{ghorfe}/users', [UserController::class, 'index']);
-Route::get('/ghorfes/{ghorfe}/users/{user}', [UserController::class, 'show']);
-Route::get('/ghorfes/{ghorfe}/employees', [EmployeeController::class, 'employees']);
-Route::get('/ghorfes/{ghorfe}/employees/{employee}', [EmployeeController::class, 'employee']);
-Route::get('/ghorfes/{ghorfe}/products', [ProductController::class, 'products']);
-Route::get('/ghorfes/{ghorfe}/products/{product}', [ProductController::class, 'product']);
+Route::prefix('ghorfes/{ghorfe:domain_active}')
+    ->scopeBindings()
+    ->group(function () {
+        Route::get('/', [GhorfeController::class, 'ghorfe']);
+        Route::get('/services', [GhorfeController::class, 'ghorfeServices']);
+        Route::get('/services/{service}', [GhorfeController::class, 'ghorfeService']);
+        Route::get('/articles', [GhorfeController::class, 'ghorfeArticles']);
+        Route::get('/galleries', [GhorfeController::class, 'ghorfeGalleries']);
+        Route::get('/callcenter', [CallCenterController::class, 'index']);
+        Route::post('/callcenter', [CallCenterController::class, 'store']);
+        Route::get('/users', [UserController::class, 'index']);
+        Route::get('/users/{user}', [UserController::class, 'show']);
+        Route::get('/employees', [EmployeeController::class, 'employees']);
+        Route::get('/employees/{employee}', [EmployeeController::class, 'employee']);
+        Route::get('/products', [ProductController::class, 'products']);
+        Route::get('/products/{product}', [ProductController::class, 'product']);
+    });

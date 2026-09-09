@@ -49,10 +49,11 @@ class GhorfeOnlineList extends Model
     /**
      * @return string
      */
-    //    public function getRouteKeyName()
-    //    {
-    //        return 'slug';
-    //    }
+    public function getRouteKeyName(): string
+    {
+        return 'domain_active';
+    }
+
 
     /**
      * @return string

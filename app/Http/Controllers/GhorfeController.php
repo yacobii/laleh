@@ -24,14 +24,15 @@ class GhorfeController extends Controller
         ]);
 
         if ($domain) {
-            $ghorfe = $query->where('domain_active', $domain)->firstOrFail();
-            return new GhorfeResource($ghorfe);
+            return new GhorfeResource(
+                $query->where('domain_active', $domain)->firstOrFail()
+            );
         }
 
-        $ghorfes = $query->paginate(10);
-
-        return GhorfeResource::collection($ghorfes);
+        return GhorfeResource::collection($query->paginate(10));
     }
+
+
 
     public function ghorfe(GhorfeOnlineList $ghorfe)
     {
