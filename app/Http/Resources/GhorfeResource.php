@@ -14,11 +14,13 @@ class GhorfeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // All raw columns (id, name, domain_active, description, ...)
-        $data = parent::toArray($request);
+        return [
+            ...parent::toArray($request),
 
-        // Merge relationships on top
-        return array_merge($data, [
+            'categories' => CategoryResource::collection(
+                $this->whenLoaded('categories')
+            ),
+
             'call_centers' => CallCenterResource::collection(
                 $this->whenLoaded('callCenters')
             ),
@@ -40,6 +42,6 @@ class GhorfeResource extends JsonResource
             'employees' => EmployeeResource::collection(
                 $this->whenLoaded('employees')
             ),
-        ]);
+        ];
     }
 }

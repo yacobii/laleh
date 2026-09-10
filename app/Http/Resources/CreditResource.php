@@ -14,12 +14,6 @@ class CreditResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'title' => $this->title,
-            'price' => $this->price,
-            'percent' => $this->percent,
-            'type' => $this->payment_type,
-        ];
+        return parent::toArray($request);
     }
 }

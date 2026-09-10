@@ -14,52 +14,23 @@ class ServiceResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            ...parent::toArray($request),
 
-            'branches' => CenterResource::collection(
-                $this->whenLoaded('centers')
-            ),
-
-            'credits' => CreditResource::collection(
-                $this->whenLoaded('financialPlansTypes')
-            ),
-
+            'status'       => (bool) $this->status,
+            'published'    => (bool) $this->published,
             'portfolio_id' => random_int(1, 5),
 
-            'title' => $this->title,
+            'link' => route('service', ['service' => $this->id]),
 
-            // Normal services-table column
-            'subtitle' => $this->subtitle,
+            'branches' => CenterResource::collection($this->whenLoaded('centers')),
+            'credits'  => CreditResource::collection($this->whenLoaded('financialPlansTypes')),
 
-            'slug' => $this->slug,
-            'description' => $this->description,
-            'payment_method' => $this->payment_method,
-            'insurance' => $this->insurance,
-            'status' => (bool) $this->status,
-            'published' => (bool) $this->published,
-            'image' => $this->image,
-            'icon' => $this->icon,
-
-            'link' => route('service', [
-                'service' => $this->id,
+            'employee_pivot' => $this->when($this->pivot !== null, fn () => [
+                'id'         => $this->pivot->id,
+                'subtitle'   => $this->pivot->subtitle,
+                'from_price' => $this->pivot->from_price,
+                'sort'       => $this->pivot->sort,
             ]),
-
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-
-            /*
-             * Present only when this resource comes from:
-             * $employee->services()
-             */
-            'employee_pivot' => $this->when(
-                $this->pivot !== null,
-                fn () => [
-                    'id' => $this->pivot->id,
-                    'subtitle' => $this->pivot->subtitle,
-                    'from_price' => $this->pivot->from_price,
-                    'sort' => $this->pivot->sort,
-                ]
-            ),
         ];
     }
 }

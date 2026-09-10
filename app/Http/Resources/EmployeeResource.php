@@ -21,7 +21,6 @@ class EmployeeResource extends JsonResource
                     $this->whenLoaded('services')
                 ),
 
-                // Exists only when employee was fetched via $ghorfe->employees()
                 'ghorfe_pivot' => $this->when(
                     $this->pivot !== null,
                     fn () => [

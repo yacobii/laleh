@@ -16,10 +16,12 @@ class PostResource extends JsonResource
     {
 
         return [
-            'id' => $this->id,
-            'title' => $this->title,
-            'link' => route('post', ['post' => $this->id]),
-            'body' => str()->words($this->body, 100),
+            ...parent::toArray($request),
+
+            'link'  => route('post', ['post' => $this->id]),
+
+            'body'  => str()->words($this->body, 100),
+
             'image' => $this->getFirstMediaUrl('post') ?: null,
         ];
     }
