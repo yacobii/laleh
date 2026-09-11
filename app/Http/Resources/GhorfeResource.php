@@ -42,6 +42,9 @@ class GhorfeResource extends JsonResource
             'employees' => EmployeeResource::collection(
                 $this->whenLoaded('employees')
             ),
+            'sliders' => SliderResource::collection(
+                $this->whenLoaded('sliders')
+            ),
         ];
     }
 }
