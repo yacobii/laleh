@@ -17,10 +17,18 @@ class GhorfeController extends Controller
         $domain = $request->header('X-Ghorfe-Domain');
 
         $query = GhorfeOnlineList::with([
+            'sliders',
+            'categories',
+            'employees',
+            'galleries',
+            'users',
             'services.centers',
             'services.financialPlansTypes',
             'products.categories',
-            'users',
+            'articles.category_article',
+            'callCenters.reason',
+            'callCenters.user',
+            'callCenters.agent',
         ]);
 
         if ($domain) {
@@ -37,12 +45,15 @@ class GhorfeController extends Controller
     public function ghorfe(GhorfeOnlineList $ghorfe)
     {
         $ghorfe->load([
+            'sliders',
+            'categories',
+            'employees',
+            'galleries',
+            'users',
             'services.centers',
             'services.financialPlansTypes',
             'products.categories',
             'articles.category_article',
-            'galleries',
-            'users',
             'callCenters.reason',
             'callCenters.user',
             'callCenters.agent',

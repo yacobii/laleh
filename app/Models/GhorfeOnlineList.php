@@ -199,14 +199,15 @@ class GhorfeOnlineList extends Model
         return $this->morphMany(About::class, 'aboutable');
     }
 
-    public function employees(): BelongsToMany
+
+    public function employees()
     {
-        return $this->belongsToMany(
+        return $this->hasMany(
             Employee::class,
-            'employee_ghorfe_online_list', // <-- Make sure this table matches exactly in DB
             'ghorfe_online_list_id',
-            'employee_id'
-        )->withPivot('id', 'sort');
+            'id'
+        );
     }
+
 
 }
