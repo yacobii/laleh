@@ -167,9 +167,7 @@ class GhorfeOnlineList extends Model
         return $this->morphMany(Slider::class, 'sliderable');
     }
 
-    /**
-     * @return MorphMany
-     */
+
     public function about()
     {
         return $this->hasOne(About::class);
